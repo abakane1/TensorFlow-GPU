@@ -87,3 +87,4 @@ plt.title('L2 Loss per Generation')
 plt.xlabel('Generation')
 plt.ylabel('L2 Loss')
 plt.show()
+
