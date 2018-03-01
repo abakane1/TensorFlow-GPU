@@ -7,9 +7,9 @@ import time
 from datetime import timedelta
 import math
 import os
-from cifar10_web import cifar10
 
 # Use PrettyTensor to simplify Neural Network construction.
 import prettytensor as pt
+import cifar10_web
 
-from tensorflow.examples.tutorials.image.cifar10 import cifar10
+
