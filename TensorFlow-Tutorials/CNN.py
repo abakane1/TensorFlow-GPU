@@ -301,6 +301,6 @@ def print_test_accuracy(show_example_errors=False,
     # if show_confusion_matrix:
     #    print("Confusion Matrix:")
     #   plot_confusion_matrix(cls_pred=cls_pred)
-# optimize(10000)
+#optimize(10000)
 
-# print_test_accuracy()
+#print_test_accuracy()
