@@ -83,3 +83,59 @@ def get_sentence_batch(batch_size, data_x, data_y, data_seqlens):
 _inputs = tf.placeholder(tf.int32, shape=[batch_size, times_steps])
 _labels = tf.placeholder(tf.float32, shape=[batch_size, num_classes])
 _seqlens = tf.placeholder(tf.int32, shape=[batch_size])
+
+with tf.name_scope("embeddings"):
+    embeddings = tf.Variable(
+        tf.random_uniform([vocabulary_size, embedding_dimension],-1.0, 1.0),name='embedding')
+    embed = tf.nn.embedding_lookup(embeddings, _inputs)
+
+with tf.variable_scope("lstm"):
+    lstm_cell = tf.contrib.rnn.BasicLSTMCell(hidden_layer_size, forget_bias=1.0)
+    outputs, states = tf.nn.dynamic_rnn(lstm_cell, embed, sequence_length= _seqlens,
+                                        dtype=tf.float32)
+
+weights = {
+    'linear_layer' : tf.Variable(tf.truncated_normal([hidden_layer_size,num_classes], mean=0, stddev=.01))
+}
+biases = {
+    'linear_layer' : tf.Variable(tf.truncated_normal([num_classes],mean=0, stddev=0.01))
+}
+
+final_output = tf.matmul(states[1],
+                         weights["linear_layer"]) + biases["linear_layer"]
+softmax = tf.nn.softmax_cross_entropy_with_logits(logits=final_output, labels = _labels)
+
+cross_entropy = tf.reduce_mean(softmax)
+
+# Training Embeddings and the LSTM Classifier
+
+train_step = tf.train.RMSPropOptimizer(0.001, 0.9).minimize(cross_entropy)
+correct_prediction = tf.equal(tf.argmax(_labels,1),
+                              tf.argmax(final_output,1))
+accurary = (tf.reduce_mean(tf.cast(correct_prediction,tf.float32)))*100
+
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+
+    for step in range(1000):
+        x_batch, y_batch, seqlen_batch = get_sentence_batch(batch_size, train_x, train_y, train_seqlens)
+
+        sess.run(train_step, feed_dict={_inputs:x_batch, _labels:y_batch, _seqlens:seqlen_batch})
+
+        if step % 100 == 0:
+            acc = sess.run(accurary, feed_dict={_inputs:x_batch,
+                                               _labels:y_batch,
+                                               _seqlens:seqlen_batch})
+            print("Accuracy at %d: %.5f" %(step, acc))
+
+    for test_batch in range(5):
+        x_test, y_test, seqlen_test = get_sentence_batch(batch_size,test_x,test_y,test_seqlens)
+        batch_pred,batch_acc = sess.run([tf.argmax(final_output,1),
+                                         accurary],
+                                        feed_dict={_inputs:x_test,
+                                                   _labels:y_test,
+                                                   _seqlens:seqlen_test})
+        print("Test batch accuarcy $d: %.5f" % (test_batch, batch_acc))
+
+    outputs_example = sess.run([outputs], feed_dict={_inputs:x_test,_labels:y_test,_seqlens:seqlen_test})
+    states_example = sess.run([states[1]], feed_dict={_inputs:x_test,_labels:y_test,_seqlens:seqlen_test})
