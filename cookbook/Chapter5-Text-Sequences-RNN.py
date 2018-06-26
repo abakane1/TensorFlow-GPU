@@ -74,7 +74,7 @@ def get_sentence_batch(batch_size, data_x, data_y, data_seqlens):
     np.random.shuffle(instance_indices)
     batch = instance_indices[:batch_size]
     x = [[word2index_map[word] for word in data_x[i].lower().split()] for i in batch]
-    y = [[data_y[i] for i in batch]]
+    y = [data_y[i] for i in batch]
     seqlens = [data_seqlens[i] for i in batch]
     return x, y, seqlens
 
