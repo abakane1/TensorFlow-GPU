@@ -13,6 +13,7 @@
 
 
 
-### TF-slim in buildings
-
+### Cookbook
+- [Learning TensorFlow: A Guide to Building Deep Learning Systems \- Tom Hope, Yehezkel S\. Resheff, Itay Lieder \- Google Books](https://books.google.com/books/about/Learning_TensorFlow.html?id=sUowDwAAQBAJ&printsec=frontcover&source=kp_read_button#v=onepage&q&f=false)
+- 20180711 finished it 
 
